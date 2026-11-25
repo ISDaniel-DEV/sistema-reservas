@@ -21,20 +21,25 @@ public class ReservaController {
     }
 
     private record CrearReservaRequest(
+            String recursoId,
             LocalDateTime startDate,
             LocalDateTime endDate
     ){}
 
     @PostMapping("/reservas")
     public ResponseEntity<Reserva> crearReserva(@RequestBody CrearReservaRequest solicitud){
+
         try {
             Reserva reserva = reservaService.crearReserva(
+                    solicitud.recursoId(),
                     solicitud.startDate(),
                     solicitud.endDate()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(reserva);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
+        }catch (ReservaSolapadaException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
